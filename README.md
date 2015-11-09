@@ -6,8 +6,7 @@ communicating with a [NATS](http://nats.io) server.
 Just download `nats.hpp` and include it in your main `ino` file.
 
 ## Example
-
-```
+```arduino
 NATS nats("mynatshost.com", NATS_DEFAULT_PORT);
 
 void foo_handler(const char* msg, const char* reply) {
