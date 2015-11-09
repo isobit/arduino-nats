@@ -7,7 +7,7 @@ communicating with a [NATS](http://nats.io) server.
 * Header-only library
 * Compatible with WiFi-cabable Arduinos, [Particle Photon / Spark
 Core](https://www.particle.io/) devices, and even the ESP8266 (if using the
-Arduino extension). (automagically detected from available headers)
+Arduino extension)
 * Familiar C++ object-oriented API, similar usage to the official NATS client
 APIs
 
