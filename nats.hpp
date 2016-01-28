@@ -7,16 +7,15 @@
 #include "application.h"
 #endif
 
+#define NATS_CLIENT_LANG "photon-cpp"
+#define NATS_CLIENT_VERSION "0.1.1"
+
 #ifndef NATS_CONF_VERBOSE
 #define NATS_CONF_VERBOSE false
 #endif
 
 #ifndef NATS_CONF_PEDANTIC
 #define NATS_CONF_PEDANTIC false
-#endif
-
-#ifndef NATS_CONF_LANG
-#define NATS_CONF_LANG "photon-cpp"
 #endif
 
 #define NATS_DEFAULT_PORT 4222
@@ -275,10 +274,18 @@ class NATS {
 
 		void send_connect() {
 			send_fmt(
-					"CONNECT {\"verbose\": %s,\"pedantic\": %s,\"lang\": \"%s\",\"user\":\"%s\",\"pass\":\"%s\"}", 
+					"CONNECT {"
+					"\"verbose\": %s,"
+					"\"pedantic\": %s,"
+					"\"lang\": \"%s\","
+					"\"version\": \"%s\","
+					"\"user\":\"%s\","
+					"\"pass\":\"%s\""
+					"}", 
 					NATS_CONF_VERBOSE? "true" : "false",
 					NATS_CONF_PEDANTIC? "true" : "false",
-					NATS_CONF_LANG,
+					NATS_CLIENT_LANG,
+					NATS_CLIENT_VERSION,
 					(user == NULL)? "null" : user,
 					(pass == NULL)? "null" : pass);
 		}
@@ -355,8 +362,8 @@ class NATS {
 			}
 			else if (strcmp(argv[0], NATS_CTRL_INFO) == 0) {
 				send_connect();
-				if (on_connect != NULL) on_connect();
 				connected = true;
+				if (on_connect != NULL) on_connect();
 			}
 
 			free(buf);
