@@ -16,7 +16,7 @@ Just download `nats.hpp` and include it in your main `ino` file.
 
 ## API
 
-```
+```c
 class NATS {
 	typedef struct {
 		const char* subject;
