@@ -24,7 +24,7 @@ class NATS {
 		const char* reply;
 		const char* data;
 		const int size;
-	} msg_event;
+	} msg;
 
 	typedef void (*sub_cb)(msg e);
 	typedef void (*event_cb)();
