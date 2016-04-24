@@ -22,10 +22,11 @@ class NATS {
 		const char* subject;
 		const int sid;
 		const char* reply;
-		const char* msg;
+		const char* data;
+		const int size;
 	} msg_event;
 
-	typedef void (*sub_cb)(msg_event e);
+	typedef void (*sub_cb)(msg e);
 	typedef void (*event_cb)();
 
 	NATS(const char* hostname, 
@@ -38,10 +39,7 @@ class NATS {
 
 	void publish(const char* subject, const char* msg = NULL, const char* replyto = NULL);
 	void publish(const char* subject, const bool msg);
-	void publish(const char* subject, const int msg);
-	void publish(const char* subject, const long msg);
-	void publish(const char* subject, const float msg);
-	void publish(const char* subject, const double msg);
+	void publish_fmt(const char* subject, const char* fmt, ...);
 
 	int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max = 0);
 	void unsubscribe(const int sid);
@@ -58,31 +56,31 @@ class NATS {
 
 NATS nats("12.34.56.78");
 
-void quux_handler(NATS::msg_event e) {
+void quux_handler(NATS::msg msg) {
 	// maybe blink an LED
 }
 
-void foo_handler(NATS::msg_event e) {
-	nats.publish(e.reply, "bar");
+void foo_handler(NATS::msg msg) {
+	nats.publish_fmt(msg.reply, "the answer is %d", 42);
 }
 
-void echo_handler(NATS::msg_event e) {
-	nats.publish(e.reply, e.msg);
+void echo_handler(NATS::msg msg) {
+	nats.publish(msg.reply, msg.data);
 }
 
-void fizzbuzz_handler(NATS::msg_event e) {
-	int n = atoi(e.msg);
+void fizzbuzz_handler(NATS::msg msg) {
+	int n = atoi(msg.data);
 	char buf[64];
 	bool fizz = !(n % 3);
 	bool buzz = !(n % 5);
 	if (fizz) sprintf(buf, "fizz");
 	if (buzz) sprintf(buf + (fizz * 4), "buzz");
 	if (!fizz && !buzz) sprintf(buf, "%d", n);
-	nats.publish(e.reply, buf);
+	nats.publish(msg.reply, buf);
 }
 
 void setup() {
-	// connect to wifi
+	// connect to wifi here
 
 	nats.connect();
 	nats.publish("hello", "I'm ready!");
@@ -92,7 +90,7 @@ void setup() {
 }
 
 void loop() {
+	// do some stuff here
 	nats.process();
-	// do some stuff
 }
 ```
