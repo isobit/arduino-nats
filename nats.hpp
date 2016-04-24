@@ -174,12 +174,13 @@ class NATS {
 			const char* subject;
 			const int sid;
 			const char* reply;
-			const char* msg;
-		} msg_event;
+			const char* data;
+			const int size;
+		} msg;
 
 	private:
 
-		typedef void (*sub_cb)(msg_event e);
+		typedef void (*sub_cb)(msg e);
 		typedef void (*event_cb)();
 
 		class Sub {
@@ -189,7 +190,7 @@ class NATS {
 			int max;
 			Sub(sub_cb cb, int max = 0) :
 				cb(cb), received(0), max(max) {}
-			void call(msg_event& e) {
+			void call(msg& e) {
 				received++;
 				cb(e);
 			}
@@ -262,6 +263,18 @@ class NATS {
 			client.println(msg);
 		}
 
+		int vasprintf(char** strp, const char* fmt, va_list ap) {
+			va_list ap2;
+			va_copy(ap2, ap);
+			char tmp[1];
+			int size = vsnprintf(tmp, 1, fmt, ap2);
+			if (size <= 0) return size;
+			va_end(ap2);
+			size += 1;
+			*strp = (char*)malloc(size * sizeof(char));
+			return vsnprintf(*strp, size, fmt, ap);
+		}
+
 		void send_fmt(const char* fmt, ...) {
 			va_list args;
 			va_start(args, fmt);
@@ -298,7 +311,7 @@ class NATS {
 				if (c == '\r') continue;
 				if (c == '\n') break;
 				if (c == -1) break;
-				if (i >= cap) buf = (char*)realloc(buf, (cap *= 2) * sizeof(char));
+				if (i >= cap) buf = (char*)realloc(buf, (cap *= 2) * sizeof(char) + 1);
 				buf[i++] = c;
 			}
 			buf[i] = '\0';
@@ -331,15 +344,16 @@ class NATS {
 				if (subs[sid] == NULL) { free(buf); return; };
 
 				// receive payload
-				int payload_size = atoi((argc == 5)? argv[4] : argv[3]);
+				int payload_size = atoi((argc == 5)? argv[4] : argv[3]) + 1;
 				char* payload_buf = client_readline(payload_size);
 
 				// put data into event struct
-				msg_event e = {
+				msg e = {
 					argv[1],
 					sid,
 					(argc == 5)? argv[3] : "",
-					payload_buf
+					payload_buf,
+					payload_size
 				};
 
 				// call callback
@@ -421,27 +435,14 @@ class NATS {
 		void publish(const char* subject, const bool msg) {
 			publish(subject, (msg)? "true" : "false");
 		}
-		void publish(const char* subject, const int msg) {
+		void publish_fmt(const char* subject, const char* fmt, ...) {
+			va_list args;
+			va_start(args, fmt);
 			char* buf;
-			asprintf(&buf, "%d", msg);
+			vasprintf(&buf, fmt, args);
+			va_end(args);
 			publish(subject, buf);
 			free(buf);
-		}
-		void publish(const char* subject, const long msg) {
-			char* buf;
-			asprintf(&buf, "%ld", msg);
-			publish(subject, buf);
-			free(buf);
-		}
-		void publish(const char* subject, const float msg) {
-			char buf[64];
-			sprintf(buf, "%f", msg);
-			publish(subject, buf);
-		}
-		void publish(const char* subject, const double msg) {
-			char buf[64];
-			sprintf(buf, "%lf", msg);
-			publish(subject, buf);
 		}
 
 		int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max = 0) {
