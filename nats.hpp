@@ -426,8 +426,8 @@ class NATS {
 		void publish(const char* subject, const char* msg = NULL, const char* replyto = NULL) {
 			if (subject == NULL || subject[0] == 0) return;
 			if (!connected) return;
-			send_fmt("PUB %s %s %lu", 
-					subject, 
+			send_fmt("PUB %s %s %lu",
+					subject,
 					(replyto == NULL)? "" : replyto,
 					(unsigned long)strlen(msg));
 			send((msg == NULL)? "" : msg);
@@ -436,6 +436,15 @@ class NATS {
 			publish(subject, (msg)? "true" : "false");
 		}
 		void publish_fmt(const char* subject, const char* fmt, ...) {
+			va_list args;
+			va_start(args, fmt);
+			char* buf;
+			vasprintf(&buf, fmt, args);
+			va_end(args);
+			publish(subject, buf);
+			free(buf);
+		}
+		void publishf(const char* subject, const char* fmt, ...) {
 			va_list args;
 			va_start(args, fmt);
 			char* buf;
