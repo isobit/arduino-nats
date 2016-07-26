@@ -39,7 +39,7 @@ class NATS {
 
 	void publish(const char* subject, const char* msg = NULL, const char* replyto = NULL);
 	void publish(const char* subject, const bool msg);
-	void publish_fmt(const char* subject, const char* fmt, ...);
+	void publishf(const char* subject, const char* fmt, ...);
 
 	int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max_wanted = 0);
 	void unsubscribe(const int sid);
@@ -62,7 +62,7 @@ void quux_handler(NATS::msg msg) {
 }
 
 void foo_handler(NATS::msg msg) {
-	nats.publish_fmt(msg.reply, "the answer is %d", 42);
+	nats.publishf(msg.reply, "the answer is %d", 42);
 }
 
 void echo_handler(NATS::msg msg) {

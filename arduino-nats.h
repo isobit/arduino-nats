@@ -395,9 +395,10 @@ class NATS {
 		}
 
 		char* generate_inbox_subject() {
-			char* buf = (char*)malloc(13 * sizeof(char));
-
-			sprintf(buf,
+			size_t size = 13 * sizeof(char);
+			char* buf = (char*)malloc(size);
+			snprintf(buf,
+					size,
 					"_INBOX.%d%d%d%d%d",
 					(int)random(0x0010000),
 					(int)random(0x0010000),
