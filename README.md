@@ -5,14 +5,14 @@ communicating with a [NATS](http://nats.io) server.
 ## Features
 
 * Header-only library
-* Compatible with WiFi-cabable Arduinos, [Particle Photon / Spark
+* Compatible with Ethernet and WiFi-cabable Arduinos, [Particle Photon / Spark
 Core](https://www.particle.io/) devices, and even the ESP8266 (if using the
 Arduino extension)
 * Familiar C++ object-oriented API, similar usage to the official NATS client
 APIs
 
 ## Installation
-Just download `nats.hpp` and include it in your main `ino` file.
+Just download `arduino-nats.h` and include it in your main `ino` file.
 
 ## API
 
@@ -29,7 +29,7 @@ class NATS {
 	typedef void (*sub_cb)(msg e);
 	typedef void (*event_cb)();
 
-	NATS(const char* hostname, 
+	NATS(Client* client, const char* hostname, 
 		 int port = NATS_DEFAULT_PORT, 
 		 const char* user = NULL, 
 		 const char* pass = NULL);
@@ -41,10 +41,10 @@ class NATS {
 	void publish(const char* subject, const bool msg);
 	void publish_fmt(const char* subject, const char* fmt, ...);
 
-	int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max = 0);
+	int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max_wanted = 0);
 	void unsubscribe(const int sid);
 
-	int request(const char* subject, const char* msg, sub_cb cb, const int max = 1);
+	int request(const char* subject, const char* msg, sub_cb cb, const int max_wanted = 1);
 
 	void process();
 }
@@ -52,9 +52,10 @@ class NATS {
 
 ## Example
 ```arduino
-#include "nats.hpp"
+#include "arduino-nats.h"
 
-NATS nats("12.34.56.78");
+WiFiClient client;
+NATS nats(&client, "12.34.56.78");
 
 void quux_handler(NATS::msg msg) {
 	// maybe blink an LED
