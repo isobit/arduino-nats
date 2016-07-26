@@ -2,9 +2,10 @@
 #define NATS_H
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
-#define TCPClient WiFiClient
+#include "Client.h"
 #elif defined(SPARK)
 #include "application.h"
+#include "spark_wiring_client.h"
 #endif
 
 #define NATS_CLIENT_LANG "photon-cpp"
@@ -208,7 +209,7 @@ class NATS {
 		const char* user;
 		const char* pass;
 
-		TCPClient client;
+		Client* client;
 
 		NATSUtil::Array<Sub*> subs;
 		NATSUtil::Queue<size_t> free_sids;
@@ -234,10 +235,11 @@ class NATS {
 	
 	public:
 
-		NATS(const char* hostname, 
+		NATS(Client* client, const char* hostname,
 				int port = NATS_DEFAULT_PORT, 
 				const char* user = NULL, 
 				const char* pass = NULL) :
+			client(client),
 			hostname(hostname),
 			port(port),
 			user(user),
@@ -260,7 +262,7 @@ class NATS {
 
 		void send(const char* msg) {
 			if (msg == NULL) return;
-			client.println(msg);
+			client->println(msg);
 		}
 
 		int vasprintf(char** strp, const char* fmt, va_list ap) {
@@ -306,8 +308,8 @@ class NATS {
 		char* client_readline(size_t cap = 128) {
 			char* buf = (char*)malloc(cap * sizeof(char));
 			int i;
-			for (i = 0; client.available();) {
-				char c = client.read();
+			for (i = 0; client->available();) {
+				char c = client->read();
 				if (c == '\r') continue;
 				if (c == '\n') break;
 				if (c == -1) break;
@@ -385,7 +387,7 @@ class NATS {
 
 		void ping() {
 			if (outstanding_pings > max_outstanding_pings) {
-				client.stop();
+				client->stop();
 				return;
 			}
 			outstanding_pings++;
@@ -408,7 +410,7 @@ class NATS {
 	public:
 
 		bool connect() {
-			if (client.connect(hostname, port)) {
+			if (client->connect(hostname, port)) {
 				outstanding_pings = 0;
 				reconnect_attempts = 0;
 				return true;
@@ -419,7 +421,7 @@ class NATS {
 
 		void disconnect() {
 			connected = false;
-			client.stop();
+			client->stop();
 			subs.empty();
 			if (on_disconnect != NULL) on_disconnect();
 		}
@@ -482,19 +484,19 @@ class NATS {
 			free_sids.push(sid);
 		}
 
-		int request(const char* subject, const char* msg, sub_cb cb, const int max = 1) {
+		int request(const char* subject, const char* msg, sub_cb cb, const int max_wanted = 1) {
 			if (subject == NULL || subject[0] == 0) return -1;
 			if (!connected) return -1;
 			char* inbox = generate_inbox_subject();
-			int sid = subscribe(inbox, cb, NULL, max);
+			int sid = subscribe(inbox, cb, NULL, max_wanted);
 			publish(subject, msg, inbox);
 			free(inbox);
 			return sid;
 		}
 
 		void process() {
-			if (client.connected()) {
-				if (client.available())
+			if (client->connected()) {
+				if (client->available())
 					recv();
 				if (ping_timer.process())
 					ping();
