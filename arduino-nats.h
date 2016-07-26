@@ -187,15 +187,15 @@ class NATS {
 			public:
 			sub_cb cb;
 			int received;
-			int max;
-			Sub(sub_cb cb, int max = 0) :
-				cb(cb), received(0), max(max) {}
+			int max_wanted;
+			Sub(sub_cb cb, int max_wanted = 0) :
+				cb(cb), received(0), max_wanted(max_wanted) {}
 			void call(msg& e) {
 				received++;
 				cb(e);
 			}
 			bool maxed() {
-				return (max == 0)? false : received >= max;
+				return (max_wanted == 0)? false : received >= max_wanted;
 			}
 		};
 
@@ -454,9 +454,9 @@ class NATS {
 			free(buf);
 		}
 
-		int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max = 0) {
+		int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max_wanted = 0) {
 			if (!connected) return -1;
-			Sub* sub = new Sub(cb, max);
+			Sub* sub = new Sub(cb, max_wanted);
 
 			int sid;
 			if (free_sids.empty()) {
