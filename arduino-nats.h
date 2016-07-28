@@ -29,9 +29,8 @@
 #define NATS_RECONNECT_INTERVAL 5000UL
 #endif
 
-#ifndef NATS_REPLY_TO_SUBJECT_LENGTH
-#define NATS_REPLY_TO_SUBJECT_LENGTH 24
-#endif
+#define NATS_INBOX_PREFIX "_INBOX."
+#define NATS_INBOX_ID_LENGTH 22
 
 #define NATS_MAX_ARGV 5
 
@@ -401,18 +400,15 @@ class NATS {
 		}
 
 		char* generate_inbox_subject() {
-			size_t size = NATS_REPLY_TO_SUBJECT_LENGTH * sizeof(char);
+			size_t size = (sizeof(NATS_INBOX_PREFIX) + NATS_INBOX_ID_LENGTH) * sizeof(char);
 			char* buf = (char*)malloc(size);
-
-			strcpy(buf, "_INBOX.");
-
-			for (int i = strlen(buf); i < NATS_REPLY_TO_SUBJECT_LENGTH - 1; i++) {
-				int random_index = random(sizeof(NATSUtil::alphanums) - 1);
-				buf[i] = NATSUtil::alphanums[random_index];
+			strcpy(buf, NATS_INBOX_PREFIX);
+			int i;
+			for (i = sizeof(NATS_INBOX_PREFIX)-1; i < size-1; i++) {
+				int random_idx = random(sizeof(NATSUtil::alphanums) - 1);
+				buf[i] = NATSUtil::alphanums[random_idx];
 			}
-
-			buf[NATS_REPLY_TO_SUBJECT_LENGTH - 1] = '\0';
-
+			buf[i] = '\0';
 			return buf;
 		}
 

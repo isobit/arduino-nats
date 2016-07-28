@@ -56,6 +56,7 @@ class NATS {
 
 ## Example
 ```arduino
+#include "Arduino.h"
 #include "arduino-nats.h"
 
 WiFiClient wifi;
@@ -92,7 +93,8 @@ void nats_on_connect() {
 }
 
 void setup() {
-	wifi.connect(...);
+	randomSeed(analogRead(0));  // see https://www.arduino.cc/en/Reference/RandomSeed
+	wifi.connect(...);			// see https://www.arduino.cc/en/Reference/WiFiClient
 	nats.on_connect = nats_on_connect;
 	nats.connect();
 }
