@@ -29,13 +29,17 @@ class NATS {
 	typedef void (*sub_cb)(msg e);
 	typedef void (*event_cb)();
 
-	NATS(Client* client, const char* hostname, 
-		 int port = NATS_DEFAULT_PORT, 
-		 const char* user = NULL, 
+	NATS(Client* client, const char* hostname,
+		 int port = NATS_DEFAULT_PORT,
+		 const char* user = NULL,
 		 const char* pass = NULL);
 
-	bool connect();
-	void disconnect();
+	bool connect();			// initiate the connection
+	void disconnect();k
+
+	event_cb on_connect;    // called after NATS finishes connecting to server
+	event_cb on_disconnect; // called when a disconnect happens
+	event_cb on_error;		// called when an error is received
 
 	void publish(const char* subject, const char* msg = NULL, const char* replyto = NULL);
 	void publish(const char* subject, const bool msg);
@@ -46,7 +50,7 @@ class NATS {
 
 	int request(const char* subject, const char* msg, sub_cb cb, const int max_wanted = 1);
 
-	void process();
+	void process();			// process pending messages from the buffer, must be called regularly in loop()
 }
 ```
 
@@ -54,8 +58,8 @@ class NATS {
 ```arduino
 #include "arduino-nats.h"
 
-WiFiClient client;
-NATS nats(&client, "12.34.56.78");
+WiFiClient wifi;
+NATS nats(&wifi, ...);
 
 void quux_handler(NATS::msg msg) {
 	// maybe blink an LED
@@ -80,14 +84,17 @@ void fizzbuzz_handler(NATS::msg msg) {
 	nats.publish(msg.reply, buf);
 }
 
-void setup() {
-	// connect to wifi here
-
-	nats.connect();
+void nats_on_connect() {
 	nats.publish("hello", "I'm ready!");
 	nats.subscribe("foo", foo_handler);
 	nats.subscribe("fizzbuzz", fizzbuzz_handler);
 	nats.request("quux", quux_handler);
+}
+
+void setup() {
+	wifi.connect(...);
+	nats.on_connect = nats_on_connect;
+	nats.connect();
 }
 
 void loop() {
