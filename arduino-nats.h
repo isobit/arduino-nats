@@ -29,6 +29,10 @@
 #define NATS_RECONNECT_INTERVAL 5000UL
 #endif
 
+#ifndef NATS_REPLY_TO_SUBJECT_LENGTH
+#define NATS_REPLY_TO_SUBJECT_LENGTH 24
+#endif
+
 #define NATS_MAX_ARGV 5
 
 #define NATS_CR_LF "\r\n"
@@ -40,6 +44,8 @@
 #define NATS_CTRL_INFO "INFO"
 
 namespace NATSUtil {
+
+	static const char alphanums[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	class MillisTimer {
 		const unsigned long interval;
@@ -204,12 +210,12 @@ class NATS {
 	
 	private:
 
+		Client* client;
+
 		const char* hostname;
 		const int port;
 		const char* user;
 		const char* pass;
-
-		Client* client;
 
 		NATSUtil::Array<Sub*> subs;
 		NATSUtil::Queue<size_t> free_sids;
@@ -395,16 +401,18 @@ class NATS {
 		}
 
 		char* generate_inbox_subject() {
-			size_t size = 13 * sizeof(char);
+			size_t size = NATS_REPLY_TO_SUBJECT_LENGTH * sizeof(char);
 			char* buf = (char*)malloc(size);
-			snprintf(buf,
-					size,
-					"_INBOX.%d%d%d%d%d",
-					(int)random(0x0010000),
-					(int)random(0x0010000),
-					(int)random(0x0010000),
-					(int)random(0x0010000),
-					(int)random(0x1000000));
+
+			strcpy(buf, "_INBOX.");
+
+			for (int i = strlen(buf); i < NATS_REPLY_TO_SUBJECT_LENGTH - 1; i++) {
+				int random_index = random(sizeof(NATSUtil::alphanums) - 1);
+				buf[i] = NATSUtil::alphanums[random_index];
+			}
+
+			buf[NATS_REPLY_TO_SUBJECT_LENGTH - 1] = '\0';
+
 			return buf;
 		}
 
