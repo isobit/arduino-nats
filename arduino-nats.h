@@ -21,6 +21,10 @@
 
 #define NATS_DEFAULT_PORT 4222
 
+#ifndef NATS_INFO_TIMEOUT
+#define NATS_INFO_TIMEOUT 1000
+#endif
+
 #ifndef NATS_PING_INTERVAL
 #define NATS_PING_INTERVAL 120000UL
 #endif
@@ -422,6 +426,13 @@ class NATS {
 			if (client->connect(hostname, port)) {
 				outstanding_pings = 0;
 				reconnect_attempts = 0;
+
+				unsigned long start = millis();
+				while(!connected || (millis() - start) >= NATS_INFO_TIMEOUT) {
+					process();
+					delay(10);
+				}
+
 				return true;
 			}
 			reconnect_attempts++;
