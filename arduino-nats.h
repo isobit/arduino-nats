@@ -8,8 +8,8 @@
 #include "spark_wiring_client.h"
 #endif
 
-#define NATS_CLIENT_LANG "photon-cpp"
-#define NATS_CLIENT_VERSION "0.1.1"
+#define NATS_CLIENT_LANG "arduino"
+#define NATS_CLIENT_VERSION "0.2.0"
 
 #ifndef NATS_CONF_VERBOSE
 #define NATS_CONF_VERBOSE false
