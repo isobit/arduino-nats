@@ -20,7 +20,7 @@ Download a zip from the [latest release](https://github.com/joshglendenning/ardu
 via _Sketch > Include Library > Add .ZIP Library_.
 
 ### Manual
-Just download `ArduinoNATS.h` and include it in your main `ino` file.
+Just download [`ArduinoNATS.h`](https://raw.githubusercontent.com/joshglendenning/arduino-nats/master/ArduinoNATS.h) and include it in your main `ino` file.
 
 ## API
 ```c
