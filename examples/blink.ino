@@ -34,7 +34,7 @@ void nats_on_connect() {
 }
 
 void setup() {
-	pinMode(LED_PIN, OUTPUT);
+	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, HIGH);
 
 	connect_wifi();
