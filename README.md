@@ -15,7 +15,7 @@ APIs
 ### [PlatformIO](http://platformio.org/)
 `platformio lib install ArduinoNATS`
 
-### Aruino IDE
+### Arduino IDE
 Download a zip from the [latest release](https://github.com/joshglendenning/arduino-nats/releases/latest) and add it
 via _Sketch > Include Library > Add .ZIP Library_.
 
