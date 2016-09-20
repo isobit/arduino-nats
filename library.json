@@ -1,0 +1,20 @@
+{
+	"name": "ArduinoNATS",
+	"keywords": "nats, messaging, microservice, tcp, network, api, web",
+	"description": "An Arduino / Spark Core / Particle Photon compatible C++ library for communicating with a NATS server.",
+	"authors": {
+		"name": "Josh Glendenning",
+		"email": "josh@isobit.io",
+		"url": "https://isobit.io"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/joshglendenning/arduino-nats.git"
+	},
+	"frameworks": "arduino",
+	"platforms": [
+		"atmelavr",
+		"espressif8266"
+	],
+	"version": "1.0.0"
+}

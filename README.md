@@ -3,19 +3,22 @@ An Arduino / Spark Core / Particle Photon compatible C++ library for
 communicating with a [NATS](http://nats.io) server.
 
 ## Features
-
 * Header-only library
 * Compatible with Ethernet and WiFi-cabable Arduinos, [Particle Photon / Spark
 Core](https://www.particle.io/) devices, and even the ESP8266 (if using the
 Arduino extension)
 * Familiar C++ object-oriented API, similar usage to the official NATS client
 APIs
+* Automatically attempts to reconnect to NATS server if the connection is dropped
 
 ## Installation
-Just download `arduino-nats.h` and include it in your main `ino` file.
+### [PlatformIO](http://platformio.org/)
+`platformio lib install ArduinoNATS`
+
+### Manual
+Just download `ArduinoNATS.h` and include it in your main `ino` file.
 
 ## API
-
 ```c
 class NATS {
 	typedef struct {
@@ -35,7 +38,17 @@ class NATS {
 		 const char* pass = NULL);
 
 	bool connect();			// initiate the connection
-	void disconnect();k
+	void disconnect();      // close the connection
+
+	bool connected;			// whether or not the client is connected
+
+	int max_outstanding_pings;	// number of outstanding pings to allow before considering the connection closed (default 3)
+	int max_reconnect_attempts; // number of times to attempt reconnects, -1 means no maximum (default -1)
+
+	event_cb on_connect;
+	event_cb on_disconnect;
+	event_cb on_error;
+
 
 	event_cb on_connect;    // called after NATS finishes connecting to server
 	event_cb on_disconnect; // called when a disconnect happens
@@ -51,55 +64,5 @@ class NATS {
 	int request(const char* subject, const char* msg, sub_cb cb, const int max_wanted = 1);
 
 	void process();			// process pending messages from the buffer, must be called regularly in loop()
-}
-```
-
-## Example
-```arduino
-#include "Arduino.h"
-#include "arduino-nats.h"
-
-WiFiClient wifi;
-NATS nats(&wifi, ...);
-
-void quux_handler(NATS::msg msg) {
-	// maybe blink an LED
-}
-
-void foo_handler(NATS::msg msg) {
-	nats.publishf(msg.reply, "the answer is %d", 42);
-}
-
-void echo_handler(NATS::msg msg) {
-	nats.publish(msg.reply, msg.data);
-}
-
-void fizzbuzz_handler(NATS::msg msg) {
-	int n = atoi(msg.data);
-	char buf[64];
-	bool fizz = !(n % 3);
-	bool buzz = !(n % 5);
-	if (fizz) sprintf(buf, "fizz");
-	if (buzz) sprintf(buf + (fizz * 4), "buzz");
-	if (!fizz && !buzz) sprintf(buf, "%d", n);
-	nats.publish(msg.reply, buf);
-}
-
-void nats_on_connect() {
-	nats.publish("hello", "I'm ready!");
-	nats.subscribe("foo", foo_handler);
-	nats.subscribe("fizzbuzz", fizzbuzz_handler);
-	nats.request("quux", quux_handler);
-}
-
-void setup() {
-	randomSeed(analogRead(0));  // see https://www.arduino.cc/en/Reference/RandomSeed
-	nats.on_connect = nats_on_connect;
-	nats.connect();
-}
-
-void loop() {
-	// do some stuff here
-	nats.process();
 }
 ```

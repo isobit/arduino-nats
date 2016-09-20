@@ -1,15 +1,13 @@
-#ifndef NATS_H
-#define NATS_H
+#ifndef ARDUINO_NATS_H
+#define ARDUINO_NATS_H
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
-#include "Client.h"
 #elif defined(SPARK)
 #include "application.h"
-#include "spark_wiring_client.h"
 #endif
 
 #define NATS_CLIENT_LANG "arduino"
-#define NATS_CLIENT_VERSION "0.2.0"
+#define NATS_CLIENT_VERSION "1.0.0"
 
 #ifndef NATS_CONF_VERBOSE
 #define NATS_CONF_VERBOSE false
@@ -19,8 +17,6 @@
 #define NATS_CONF_PEDANTIC false
 #endif
 
-#define NATS_DEFAULT_PORT 4222
-
 #ifndef NATS_PING_INTERVAL
 #define NATS_PING_INTERVAL 120000UL
 #endif
@@ -28,6 +24,8 @@
 #ifndef NATS_RECONNECT_INTERVAL
 #define NATS_RECONNECT_INTERVAL 5000UL
 #endif
+
+#define NATS_DEFAULT_PORT 4222
 
 #define NATS_INBOX_PREFIX "_INBOX."
 #define NATS_INBOX_ID_LENGTH 22
@@ -241,8 +239,8 @@ class NATS {
 	public:
 
 		NATS(Client* client, const char* hostname,
-				int port = NATS_DEFAULT_PORT, 
-				const char* user = NULL, 
+				int port = NATS_DEFAULT_PORT,
+				const char* user = NULL,
 				const char* pass = NULL) :
 			client(client),
 			hostname(hostname),
@@ -295,12 +293,12 @@ class NATS {
 		void send_connect() {
 			send_fmt(
 					"CONNECT {"
-					"\"verbose\": %s,"
-					"\"pedantic\": %s,"
-					"\"lang\": \"%s\","
-					"\"version\": \"%s\","
-					"\"user\":\"%s\","
-					"\"pass\":\"%s\""
+						"\"verbose\": %s,"
+						"\"pedantic\": %s,"
+						"\"lang\": \"%s\","
+						"\"version\": \"%s\","
+						"\"user\":\"%s\","
+						"\"pass\":\"%s\""
 					"}", 
 					NATS_CONF_VERBOSE? "true" : "false",
 					NATS_CONF_PEDANTIC? "true" : "false",
