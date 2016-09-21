@@ -1,7 +1,7 @@
 {
 	"name": "ArduinoNATS",
 	"keywords": "nats, messaging, microservice, tcp, network, api, web",
-	"description": "An Arduino / Spark Core / Particle Photon compatible C++ library for communicating with a NATS server.",
+	"description": "An Arduino / ESP8266 / Particle Photon compatible C++ library for communicating with a NATS (http://nats.io) server.",
 	"authors": {
 		"name": "Josh Glendenning",
 		"email": "josh@isobit.io",
