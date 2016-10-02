@@ -36,10 +36,13 @@ class NATS {
 	typedef void (*sub_cb)(msg e);
 	typedef void (*event_cb)();
 
-	NATS(Client* client, const char* hostname,
-		 int port = NATS_DEFAULT_PORT,
-		 const char* user = NULL,
-		 const char* pass = NULL);
+	NATS(
+		Client* client,
+		const char* hostname,
+		int port = NATS_DEFAULT_PORT,
+		const char* user = NULL,
+		const char* pass = NULL
+	);
 
 	bool connect();			// initiate the connection
 	void disconnect();      // close the connection
