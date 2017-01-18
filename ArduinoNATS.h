@@ -423,6 +423,7 @@ class NATS {
 		}
 
 		void disconnect() {
+			if (!connected) return;
 			connected = false;
 			client->stop();
 			subs.empty();
