@@ -52,11 +52,6 @@ class NATS {
 	int max_outstanding_pings;	// number of outstanding pings to allow before considering the connection closed (default 3)
 	int max_reconnect_attempts; // number of times to attempt reconnects, -1 means no maximum (default -1)
 
-	event_cb on_connect;
-	event_cb on_disconnect;
-	event_cb on_error;
-
-
 	event_cb on_connect;    // called after NATS finishes connecting to server
 	event_cb on_disconnect; // called when a disconnect happens
 	event_cb on_error;		// called when an error is received
