@@ -5,11 +5,11 @@
 	"authors": {
 		"name": "Josh Glendenning",
 		"email": "josh@isobit.io",
-		"url": "https://isobit.io"
+		"url": "https://www.isobit.io"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/joshglendenning/arduino-nats.git"
+		"url": "https://github.com/isobit/arduino-nats.git"
 	},
 	"frameworks": "arduino",
 	"platforms": [
