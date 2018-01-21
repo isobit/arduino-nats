@@ -63,7 +63,8 @@ class NATS {
 	int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max_wanted = 0);
 	void unsubscribe(const int sid);
 
-	int request(const char* subject, const char* msg, sub_cb cb, const int max_wanted = 1);
+	char* generate_inbox_subject();
+	int request(const char* subject, const char* inbox, const char* msg, sub_cb cb, const int max_wanted = 1);
 
 	void process();			// process pending messages from the buffer, must be called regularly in loop()
 }
