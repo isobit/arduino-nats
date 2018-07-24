@@ -1,7 +1,8 @@
 {
 	"name": "ArduinoNATS",
-	"keywords": "nats, messaging, microservice, tcp, network, arduino, esp8266",
+	"version": "1.1.2",
 	"description": "An Arduino / ESP8266 / Particle Photon compatible C++ library for communicating with a NATS (http://nats.io) server.",
+	"keywords": "nats, messaging, microservice, tcp, network, arduino, esp8266",
 	"authors": {
 		"name": "Josh Glendenning",
 		"email": "josh@isobit.io",
@@ -15,6 +16,5 @@
 	"platforms": [
 		"atmelavr",
 		"espressif8266"
-	],
-	"version": "1.1.1"
+	]
 }
