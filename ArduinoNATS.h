@@ -488,10 +488,9 @@ class NATS {
 			free_sids.push(sid);
 		}
 
-		int request(const char* subject, const char* msg, sub_cb cb, const int max_wanted = 1) {
+		int request(const char* subject, const char* inbox, const char* msg, sub_cb cb, const int max_wanted = 1) {
 			if (subject == NULL || subject[0] == 0) return -1;
 			if (!connected) return -1;
-			char* inbox = generate_inbox_subject();
 			int sid = subscribe(inbox, cb, NULL, max_wanted);
 			publish(subject, msg, inbox);
 			free(inbox);
