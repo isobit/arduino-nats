@@ -1,0 +1,2 @@
+aiomonitor
+nats-py

@@ -25,13 +25,20 @@ Just download [`ArduinoNATS.h`](https://raw.githubusercontent.com/joshglendennin
 ## API
 ```c
 class NATS {
-	typedef struct {
+	class msg {
+	private:
+		NATS* nats;
+	public:
 		const char* subject;
 		const int sid;
 		const char* reply;
 		const char* data;
 		const int size;
-	} msg;
+
+		msg(const char* subject, const int sid, const char* reply, const char* data, const int size, NATS* nats);
+		void respond(String msg = "");
+		void respond(const char* msg = "");
+	};
 
 	typedef void (*sub_cb)(msg e);
 	typedef void (*event_cb)();
@@ -41,7 +48,8 @@ class NATS {
 		const char* hostname,
 		int port = NATS_DEFAULT_PORT,
 		const char* user = NULL,
-		const char* pass = NULL
+		const char* pass = NULL,
+		const bool verbose = false
 	);
 
 	bool connect();			// initiate the connection
@@ -56,6 +64,7 @@ class NATS {
 	event_cb on_disconnect; // called when a disconnect happens
 	event_cb on_error;		// called when an error is received
 
+	void publish(const char* subject, String msg = "", const char* replyto = NULL);
 	void publish(const char* subject, const char* msg = NULL, const char* replyto = NULL);
 	void publish(const char* subject, const bool msg);
 	void publishf(const char* subject, const char* fmt, ...);
@@ -63,8 +72,15 @@ class NATS {
 	int subscribe(const char* subject, sub_cb cb, const char* queue = NULL, const int max_wanted = 0);
 	void unsubscribe(const int sid);
 
+	int request(const char* subject, String msg, sub_cb cb, const int max_wanted = 1);
 	int request(const char* subject, const char* msg, sub_cb cb, const int max_wanted = 1);
 
 	void process();			// process pending messages from the buffer, must be called regularly in loop()
 }
 ```
+
+
+## JetStream
+
+You can create a JetStream on your backend and subscribe to its topic with the simple NATS core `subscribe()` method.
+Check the [example](/examples/jet-stream/README.md) for more details.
